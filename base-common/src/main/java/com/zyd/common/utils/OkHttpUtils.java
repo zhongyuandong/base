@@ -3,6 +3,7 @@ package com.zyd.common.utils;
 import com.alibaba.fastjson.JSON;
 import com.zyd.common.constance.Constants;
 import okhttp3.*;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * @author 85728
@@ -239,8 +241,7 @@ public class OkHttpUtils {
     public OkHttpUtils postByJson(String json) {
         RequestBody requestBody;
         requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
-
-        if (CollectionUtils.isNotEmpty(paramMap)) {
+        if (MapUtils.isNotEmpty(paramMap)) {
             paramMap.entrySet().stream().map(e -> String.format("%s=%s", e.getKey(), e.getValue())).collect(Collectors.joining(Constants.AMPERSAND));
         }
         request = new Request.Builder().post(requestBody).url(url);
@@ -259,7 +260,7 @@ public class OkHttpUtils {
         requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
 
         String postUrl = url;
-        if (CollectionUtils.isNotEmpty(paramMap)) {
+        if (MapUtils.isNotEmpty(paramMap)) {
             String param = paramMap.entrySet().stream()
                     .filter(e -> !StringUtils.isAnyBlank(e.getKey(), e.getValue()))
                     .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
@@ -278,14 +279,14 @@ public class OkHttpUtils {
         requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
 
         String patchUrl = url;
-        if (CollectionUtils.isNotEmpty(variablesMap)){
+        if (MapUtils.isNotEmpty(variablesMap)){
             String finalPatchUrl = url;
             variablesMap.forEach((key, value) -> {
                 url = finalPatchUrl.replace(String.format(":%s", key), value);
             });
             patchUrl = url;
         }
-        if (CollectionUtils.isNotEmpty(paramMap)) {
+        if (MapUtils.isNotEmpty(paramMap)) {
             String param = paramMap.entrySet().stream()
                     .filter(e -> !StringUtils.isAnyBlank(e.getKey(), e.getValue()))
                     .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
