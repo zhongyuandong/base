@@ -4,17 +4,18 @@
 
   <groupId>com.zyd.base</groupId>
   <artifactId>base</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
   <name>base</name>
   <url>http://maven.apache.org</url>
   <modules>
-    <module>base-common</module>
+      <module>base-common</module>
       <module>tech-zeppelin</module>
   </modules>
 
   <properties>
+    <revision>1.0-SNAPSHOT</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <commons.lang3.version>3.12.0</commons.lang3.version>
     <slf4j.api.version>2.0.7</slf4j.api.version>
