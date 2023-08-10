@@ -5,7 +5,6 @@ import com.zyd.common.utils.OkHttpUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.zeppelin.client.*;
 import com.zyd.tech.zeppelin.utils.ZeppelinClient;
-import org.apache.zeppelin.common.SessionInfo;
 
 import java.util.List;
 
@@ -20,14 +19,10 @@ public class ParagraphOperations {
 
     public static void main(String[] args) throws Exception {
 //        String userPassword = "bigdata_dev" + ":" + "BS0opayMXf5JRhSg";
-//        userPassword = "8fc74cbb-0542-4895-9e78-f101de5cee7d";
 //        String encodedAuth = Base64.getEncoder().encodeToString(userPassword.getBytes());
 //        System.out.println(encodedAuth);
         deleteParagraph();
 
-//        HttpResponse<JsonNode> response = ((HttpRequestWithBody)((HttpRequestWithBody) Unirest.delete("/notebook/{noteId}/paragraph/{paragraphId}")
-//                .routeParam("noteId", "2JAB4GBJ7")).routeParam("paragraphId", "paragraph_1691657389337_1354488910")).asJson();
-//        System.out.println(response);
 //        clientApi();
     }
 
