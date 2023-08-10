@@ -11,6 +11,7 @@
   <url>http://maven.apache.org</url>
   <modules>
     <module>base-common</module>
+      <module>tech-zeppelin</module>
   </modules>
 
   <properties>
