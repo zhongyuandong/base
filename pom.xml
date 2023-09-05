@@ -12,6 +12,7 @@
   <modules>
       <module>base-common</module>
       <module>tech-zeppelin</module>
+      <module>tech-hbase</module>
   </modules>
 
   <properties>
