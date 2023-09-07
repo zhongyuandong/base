@@ -24,7 +24,6 @@
         <hive.version>2.1.1-cdh6.2.0</hive.version>
         <hadoop.version>3.0.0-cdh6.2.0</hadoop.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -192,7 +191,7 @@
         <dependency>
             <groupId>com.zjkj.realtime.impl</groupId>
             <artifactId>Test-project1</artifactId>
-            <version>1.0.1</version>
+            <version>3.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -217,8 +216,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>utf-8</encoding>
                 </configuration>
             </plugin>
@@ -257,7 +256,7 @@
 
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.zyd.tech.catalog.test.HiveCatalog1</mainClass>
+                                    <mainClass>com.zjkj.realtime.UACSync</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
