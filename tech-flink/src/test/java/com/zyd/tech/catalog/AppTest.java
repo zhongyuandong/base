@@ -1,4 +1,4 @@
-package com.zyd.tech.hbase;
+package com.zyd.tech.catalog;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
