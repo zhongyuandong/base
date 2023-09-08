@@ -1,5 +1,6 @@
 package com.zyd.tech.catalog.main;
 
+import com.alibaba.fastjson.JSON;
 import com.zyd.tech.catalog.utils.FlinkUtil;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.CheckpointingMode;
@@ -19,6 +20,10 @@ import org.apache.flink.table.catalog.hive.HiveCatalog;
 public class HiveCatalog2 {
 
     public static void main(String[] args) throws Exception {
+
+
+        try {
+
 
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -50,22 +55,20 @@ public class HiveCatalog2 {
         String appName = flinkConf.getString("yarn.application.name", "flink-cdc-test");
         tableConfig.getConfiguration().setString("pipeline.name",appName);
 
-        System.setProperty("HADOOP_USER_NAME", "hive");
+//        System.setProperty("HADOOP_USER_NAME", "hive");
         String name            = "hive_catalog_7";
         String defaultDatabase = "catalog_test";
-        String hiveConfDir     = "D:\\tmp\\hive-site1";
+//        String hiveConfDir     = "D:\\tmp\\hive-site1";
+        String hiveConfDir     = "/opt/flink/conf/hive";
         String version         = "2.1.1";
-
-
         HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
-
         hiveCatalog.open();
 
 //
-        //获取funciton信息
+        //获取function信息
         CatalogFunction elv2 = hiveCatalog.getFunction(new ObjectPath(defaultDatabase, "funEvl1"));
 
-        System.out.println(elv2);
+        System.out.println("获取function信息>>>>" + JSON.toJSONString(elv2));
 
 
 
@@ -74,17 +77,47 @@ public class HiveCatalog2 {
         tableEnv.registerCatalog(name,hiveCatalog);
         tableEnv.useCatalog(name);
 
+        long time = System.currentTimeMillis();
+
         // 选择 database
         tableEnv.useDatabase(defaultDatabase);
 
+        String tableName = "hive_catalog_7.catalog_test.flink_source_table_" + time;
+
+            String cdcTableC="CREATE TABLE " + tableName + " ( "
+                    +"        id int NOT NULL, "
+                    +"        num1 int, "
+                    +"        num2 int, "
+                    +"        str1 STRING, "
+                    +"        str2 STRING, "
+                    +"        name STRING, "
+                    +"        type STRING, "
+                    +"        primary key (id) not enforced"
+                    +"    ) WITH ( "
+                    +"       'connector' = 'mysql-cdc', "
+                    +"       'hostname' = 'qa-cdh-002', "
+                    +"       'port' = '3306', "
+                    +"       'username' = 'root', "
+                    +"       'password' = 'dsf!G13#dsd', "
+//                +"       'is_generic' = 'false', "
+                    +"       'database-name' = 'hive_catalog_source', "
+                    +"       'table-name' = 'source_table3' "
+                    +" )";
+
+        tableEnv.executeSql(cdcTableC);
 
 
 
 
 
-        String selectSqlB = "select funEvl1(id,type) local_func1 from hive_catalog_7.catalog_test.flink_source_table_c2";
+        String selectSqlB = "select funEvl1(id,type) local_func1 from " + tableName;
 
         tableEnv.sqlQuery(selectSqlB).execute().print();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("捕获到异常消息：" + e.getMessage());
+        }
 
     }
 }

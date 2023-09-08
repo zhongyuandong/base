@@ -25,6 +25,7 @@ import org.apache.flink.table.catalog.CatalogFunction;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -51,6 +52,7 @@ public class TestK8sConsumer {
         ProperUtil proper = new ProperUtil(args[0]);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // 每隔1000 ms进行启动一个检查点【设置checkpoint的周期】
+
         env.enableCheckpointing(60000);
         // 高级选项：
         // 设置模式为exactly-once （这是默认值）
@@ -70,38 +72,6 @@ public class TestK8sConsumer {
         pro.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
 //        pro.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         pro.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-
-        EnvironmentSettings Settings = EnvironmentSettings.newInstance()
-        .useBlinkPlanner()
-        .inStreamingMode()
-        .build();
-        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env, Settings);
-        TableConfig tableConfig = tableEnv.getConfig();
-        tableConfig.setSqlDialect(SqlDialect.DEFAULT);
-
-        tableConfig.getConfiguration().setString("pipeline.name","flink-cdc-test");
-
-        System.setProperty("HADOOP_USER_NAME", "hive");
-        String name            = "hive_catalog_7";
-        String defaultDatabase = "catalog_test";
-        String hiveConfDir     = "D:\\tmp\\hive-site";
-        String version         = "2.1.1";
-        HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
-        hiveCatalog.open();
-        //获取funciton信息
-        CatalogFunction elv2 = hiveCatalog.getFunction(new ObjectPath(defaultDatabase, "funEvl1"));
-        System.out.println(elv2);
-        System.err.printf("clName:%s\n" ,Thread.currentThread().getContextClassLoader().getClass().getName() );
-
-        tableEnv.registerCatalog(name,hiveCatalog);
-        tableEnv.useCatalog(name);
-
-        // 选择 database
-        tableEnv.useDatabase(defaultDatabase);
-        String selectSqlB = "select funEvl1(id,type) local_func1 from hive_catalog_7.catalog_test.flink_source_table_c2";
-
-        tableEnv.sqlQuery(selectSqlB).execute().print();
-
 
 
         String topic = (String) proper.get("kafka_k8s_test_topic");
@@ -178,6 +148,20 @@ public class TestK8sConsumer {
                         }
 
                         logger.info("写入hbase数据成功！");
+
+                        logger.info("开始读取hbase数据....");
+
+                        Table avTableQuery = connection.getTable(TableName.valueOf("iot_sz:av_detail"));
+
+                        Get get = new Get(Bytes.toBytes("0000000251_axisVarietyId1_1207yc428143_1638890523"));
+                        Result result = avTableQuery.get(get);
+                        Map<String, String> axisMap = new HashMap<>();
+                        for (Cell kv : result.rawCells()) {
+                            String colName = Bytes.toString(kv.getQualifierArray(), kv.getQualifierOffset(), kv.getQualifierLength());
+                            String value = Bytes.toString(kv.getValueArray(), kv.getValueOffset(), kv.getValueLength());
+                            logger.info("获取到hbase数据colName：" + colName);
+                            logger.info("获取到hbase数据value：" + value);
+                        }
                     }
                 });
 
