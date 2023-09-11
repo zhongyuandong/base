@@ -14,14 +14,10 @@ import org.apache.flink.table.catalog.CatalogFunction;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-
 /**
  * mysql binlog 数据实时写到adb
  */
-public class HiveCatalog2 {
+public class HiveCatalog3 {
 
     public static void main(String[] args) throws Exception {
 
@@ -47,7 +43,7 @@ public class HiveCatalog2 {
         env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
         EnvironmentSettings Settings = EnvironmentSettings.newInstance()
-                //.useBlinkPlanner()
+                .useBlinkPlanner()
                 .inStreamingMode()
                 .build();
 
@@ -59,11 +55,11 @@ public class HiveCatalog2 {
         String appName = flinkConf.getString("yarn.application.name", "flink-cdc-test");
         tableConfig.getConfiguration().setString("pipeline.name",appName);
 
-//        System.setProperty("HADOOP_USER_NAME", "hive1");
+        System.setProperty("HADOOP_USER_NAME", "hive");
         String name            = "hive_catalog_7";
         String defaultDatabase = "catalog_test";
-//        String hiveConfDir     = "D:\\tmp\\hive-site";
-        String hiveConfDir     = "/opt/flink/conf/hive";
+        String hiveConfDir     = "D:\\tmp\\hive-site";
+//        String hiveConfDir     = "/opt/flink/conf/hive";
         String version         = "2.1.1";
         HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
         hiveCatalog.open();
@@ -85,10 +81,6 @@ public class HiveCatalog2 {
 
         // 选择 database
         tableEnv.useDatabase(defaultDatabase);
-        String hostName = "qa-cdh-002";
-        int port = 3306;
-
-            telnet(hostName, port, 10000);
 
         String tableName = "hive_catalog_7.catalog_test.flink_source_table_" + time;
 
@@ -107,45 +99,54 @@ public class HiveCatalog2 {
                     +"       'port' = '3306', "
                     +"       'username' = 'root', "
                     +"       'password' = 'dsf!G13#dsd', "
+//                +"       'is_generic' = 'false', "
                     +"       'database-name' = 'hive_catalog_source', "
                     +"       'table-name' = 'source_table3' "
                     +" )";
 
-        tableEnv.executeSql(cdcTableC).print();
+        tableEnv.executeSql(cdcTableC);
 
 
 
 
 
-        String selectSqlB = "select id,type local_func1 from " + tableName;
-//            String selectSqlB = "select funEvl1(id,type) local_func1 from " + tableName;
+//        String selectSqlB = "select funEvl1(id,type) local_func1 from " + tableName;
+//
+//        tableEnv.sqlQuery(selectSqlB).execute().print();
 
-        tableEnv.executeSql(selectSqlB).print();
+
+            tableEnv.executeSql("CREATE DATABASE IF NOT EXISTS catalog_test");
+            tableEnv.executeSql("DROP TABLE IF EXISTS catalog_test.log_hive");
+
+//            tableEnv.executeSql(" CREATE TABLE hive_tmp.log_hive (\n" +
+//                    "                     user_id STRING,\n" +
+//                    "                     name1 STRING \n" +
+//                    "           ) PARTITIONED BY (\n" +
+//                    "                     dt STRING,\n" +
+//                    "                     hr STRING\n" +
+//                    "           ) STORED AS PARQUET\n" +
+//                    "             TBLPROPERTIES (\n" +
+//                    "                    'sink.partition-commit.trigger' = 'partition-time',\n" +
+//                    "                    'sink.partition-commit.delay' = '1 min',\n" +
+//                    "                    'format' = 'json',\n" +
+//                    "                    'sink.partition-commit.policy.kind' = 'metastore,success-file',\n" +
+//                    "                    'partition.time-extractor.timestamp-pattern'='$dt $hr:00:00'" +
+//                    "           )");
+            tableEnv.executeSql(" CREATE TABLE catalog_test.log_hive (user_id STRING,name1 STRING)");
+            tableEnv.getConfig().setSqlDialect(SqlDialect.DEFAULT);
+//            tableEnv.executeSql("" +
+//                    "        INSERT INTO hive_tmp.log_hive\n" +
+//                    "        SELECT\n" +
+//                    "               str1,\n" +
+//                    "               str2,\n" +
+//                    "               DATE_FORMAT(log_ts, 'yyyy-MM-dd'), DATE_FORMAT(log_ts, 'HH')\n" +
+//                    "               FROM " + tableName);
+            tableEnv.executeSql("INSERT INTO catalog_test.log_hive SELECT str1, str2 FROM " + tableName);
 
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("捕获到异常消息：" + e.getMessage());
         }
 
-    }
-
-    public static boolean telnet(String hostname, int port, int timeout){
-        Socket socket = new Socket();
-        boolean isConnected = false;
-        try {
-            socket.connect(new InetSocketAddress(hostname, port), timeout); // 建立连接
-            isConnected = socket.isConnected(); // 通过现有方法查看连通状态
-//            System.out.println(isConnected);    // true为连通
-        } catch (IOException e) {
-            System.out.println("false");        // 当连不通时，直接抛异常，异常捕获即可
-        }finally{
-            try {
-                socket.close();   // 关闭连接
-            } catch (IOException e) {
-                System.out.println("false");
-            }
-        }
-        System.out.println("telnet "+ hostname + " " + port + "\n==>isConnected: " + isConnected);
-        return isConnected;
     }
 }
