@@ -62,8 +62,8 @@ public class HiveCatalog2 {
 //        System.setProperty("HADOOP_USER_NAME", "hive1");
         String name            = "hive_catalog_7";
         String defaultDatabase = "catalog_test";
-//        String hiveConfDir     = "D:\\tmp\\hive-site";
-        String hiveConfDir     = "/opt/flink/conf/hive";
+        String hiveConfDir     = "D:\\tmp\\hive-site";
+      //  String hiveConfDir     = "/opt/flink/conf/hive";
         String version         = "2.1.1";
         HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
         hiveCatalog.open();
@@ -90,7 +90,7 @@ public class HiveCatalog2 {
 
             telnet(hostName, port, 10000);
 
-        String tableName = "hive_catalog_7.catalog_test.flink_source_table_" + time;
+        String tableName = "default_catalog.default_database.flink_source_table_" + time;
 
             String cdcTableC="CREATE TABLE " + tableName + " ( "
                     +"        id int NOT NULL, "
@@ -111,16 +111,62 @@ public class HiveCatalog2 {
                     +"       'table-name' = 'source_table3' "
                     +" )";
 
+            cdcTableC = "create table " + tableName + " (\n" +
+                    "  mdata row(\n" +
+                    "    cTime bigint,\n" +
+                    "    orgCode varchar\n" +
+                    "  ),\n" +
+                    "  cTime as mdata.cTime,\n" +
+                    "  orgCode as mdata.orgCode\n" +
+                    ") with (\n" +
+                    "  'connector' = 'kafka',\n" +
+                    "  'topic' = 'k8s_test01',\n" +
+                    "  'format' = 'json',\n" +
+                    "  'properties.bootstrap.servers' = 'qa-cdh-001:9093,qa-cdh-002:9093,qa-cdh-003:9093',\n" +
+                    "  'properties.group.id' = 'k8s_test0_202309121',\n" +
+                    "  'scan.startup.mode' = 'group-offsets',\n" +
+                    "  'scan.topic-partition-discovery.interval' = '1000',\n" +
+                    "  'json.ignore-parse-errors' = 'true'\n" +
+                    ")";
+
+//            cdcTableC = "create table " + tableName + " (\n" +
+//                    "id INT, name STRING, age INT\n" +
+//                    ") with (\n" +
+//                    "  'connector' = 'kafka',\n" +
+//                    "  'topic' = 'k8s_test01',\n" +
+//                    "  'format' = 'json',\n" +
+//                    "  'properties.bootstrap.servers' = 'qa-kafka-cluster01:9093',\n" +
+//                    "  'properties.group.id' = 'k8s_test0_202309121',\n" +
+//                    "  'scan.startup.mode' = 'group-offsets',\n" +
+//                    "  'scan.topic-partition-discovery.interval' = '1000',\n" +
+//                    "  'json.ignore-parse-errors' = 'true'\n" +
+//                    ")";
+//
+//            cdcTableC = "CREATE TABLE user_behavior (\n" +
+//                    "    id BIGINT,\n" +
+//                    "    name STRING,\n" +
+//                    "    flag STRING\n" +
+//                    ") WITH (\n" +
+//                    "    'connector.type' = 'kafka',\n" +
+//                    "    'connector.version' = 'universal',\n" +
+//                    "    'connector.topic' = 'k8s_test01',\n" +
+//                    "    'connector.startup-mode' = 'earliest-offset',\n" +
+////                    "    'connector.properties.zookeeper.connect' = 'vm61:2181',\n" +
+//                    "    'connector.properties.bootstrap.servers' = 'qa-kafka-cluster01:9093',\n" +
+//                    "    'format.type' = 'json'\n" +
+//                    ")";
         tableEnv.executeSql(cdcTableC).print();
 
 
 
 
 
-        String selectSqlB = "select id,type local_func1 from " + tableName;
-//            String selectSqlB = "select funEvl1(id,type) local_func1 from " + tableName;
+//        String selectSqlB = "select id,type local_func1 from " + tableName;
+            String selectSqlB = "select * from " + tableName;
+//            selectSqlB = "select * from user_behavior";
+//            String selectSqlB = "select funEvl1(cTime,orgCode) local_func1 from " + tableName;
 
-        tableEnv.executeSql(selectSqlB).print();
+        tableEnv.sqlQuery(selectSqlB).execute().print();
 
         } catch (Exception e) {
             e.printStackTrace();
