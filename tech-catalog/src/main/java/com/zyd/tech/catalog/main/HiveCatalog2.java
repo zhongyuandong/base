@@ -59,11 +59,11 @@ public class HiveCatalog2 {
         String appName = flinkConf.getString("yarn.application.name", "flink-cdc-test");
         tableConfig.getConfiguration().setString("pipeline.name",appName);
 
-//        System.setProperty("HADOOP_USER_NAME", "hive1");
+//      System.setProperty("HADOOP_USER_NAME", "hive1");
         String name            = "hive_catalog_7";
         String defaultDatabase = "catalog_test";
         String hiveConfDir     = "D:\\tmp\\hive-site";
-      //  String hiveConfDir     = "/opt/flink/conf/hive";
+    //  String hiveConfDir     = "/opt/flink/conf/hive";
         String version         = "2.1.1";
         HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
         hiveCatalog.open();

@@ -7,6 +7,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.SqlDialect;
+import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.CatalogFunction;
 import org.apache.flink.table.catalog.ObjectPath;
@@ -17,6 +19,8 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.flink.table.catalog.hive.HiveCatalog;
 
 public class KafkaSql {
 
@@ -63,17 +67,20 @@ public class KafkaSql {
         if (MapUtils.isNotEmpty(envConf)) {
             envConfig.addAll(Configuration.fromMap(envConf));
         }
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(envConfig);
+        EnvironmentSettings settings = EnvironmentSettings.newInstance().inStreamingMode().build();
+        TableEnvironment tEnv = TableEnvironment.create(settings);
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(envConfig);
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         env.enableCheckpointing(60000, CheckpointingMode.EXACTLY_ONCE);
-        StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
+//        StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
         Configuration tableEnvConfig = tEnv.getConfig().getConfiguration();
         if (MapUtils.isNotEmpty(tableEnvConf)) {
             tableEnvConfig.addAll(Configuration.fromMap(tableEnvConf));
         }
 
-        StringWriter sw = new StringWriter();
-        String allSql = "create table default_catalog.default_database.source_connector_hermes_test (\n" +
+        String tableName = "default_catalog.default_database.source_connector_hermes_test";
+        String allSql = "create table " + tableName + " (\n" +
                 "    mdata row(\n" +
                 "        device row(\n" +
                 "            name varchar\n" +
@@ -113,19 +120,45 @@ public class KafkaSql {
         String name            = "hive_catalog_7";
         String defaultDatabase = "catalog_test";
         String hiveConfDir     = "D:\\tmp\\hive-site";
-        //  String hiveConfDir     = "/opt/flink/conf/hive";
+//          String hiveConfDir     = "/opt/flink/conf/hive";
+//        String hiveConfDir     = "/opt/bd-pb-data/flink_data/conf/hive";
         String version         = "2.1.1";
         HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
-        hiveCatalog.open();
-
-        //获取function信息
-        CatalogFunction elv2 = hiveCatalog.getFunction(new ObjectPath(defaultDatabase, "funEvl1"));
-
-        System.out.println("获取function信息>>>>" + JSON.toJSONString(elv2));
         tEnv.registerCatalog(name,hiveCatalog);
         tEnv.useCatalog(name);
-        String selectSqlB = "select funEvl1(deviceTime,mcStatus) hha1 from default_catalog.default_database.source_connector_hermes_test";
+        String selectSqlB = "select funEvl1(deviceTime,mcStatus) aa, rowTime ,'20230915' a1, '09' a2 from " + tableName;
         tEnv.sqlQuery(selectSqlB).execute().print();
+//        tEnv.executeSql("CREATE TABLE  default_catalog.default_database.ods_iot_test_di  (\n" +
+//                " device_num string,\n" +
+//                " cloud_time bigint,\n" +
+//                " bdata string\n" +
+//                ") PARTITIONED BY (namespace STRING, hh STRING) STORED AS orc TBLPROPERTIES  (\n" +
+//                "  'partition.time-extractor.timestamp-pattern'='$namespace $hh:00:00',\n" +
+//                "  'sink.partition-commit.trigger'='partition-time',\n" +
+//                "  'sink.partition-commit.watermark-time-zone'='Asia/Shanghai',\n" +
+//                "  'sink.partition-commit.delay'='1 min',\n" +
+//                "  'sink.partition-commit.policy.kind'='success-file'\n" +
+//                ")");
+//        tEnv.executeSql("SET table.sql-dialect=hive");
+//        tEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
+//        String hiveTable = String.format("%s.%s.%s", name, defaultDatabase, "hive_table");
+//        tEnv.executeSql("CREATE TABLE " + hiveTable + " (\n" +
+//                "  user_id STRING,\n" +
+//                "  order_amount INT\n" +
+//                ") PARTITIONED BY (dt STRING, hr STRING) STORED AS parquet TBLPROPERTIES (\n" +
+//                "  'partition.time-extractor.timestamp-pattern'='$dt $hr:00:00',\n" +
+//                "  'sink.partition-commit.trigger'='partition-time',\n" +
+//                "  'sink.partition-commit.delay'='1 h',\n" +
+//                "  'sink.partition-commit.policy.kind'='metastore,success-file'\n" +
+//                ")");
+//        tEnv.getConfig().setSqlDialect(SqlDialect.DEFAULT);
+////        tEnv.executeSql("SET table.sql-dialect=default");
+//        tEnv.executeSql("INSERT INTO " + hiveTable + " \n" +
+//                "select funEvl1(deviceTime,mcStatus) aa, ctime ,'20230915' a1, '09' a2 \n" +
+//                "FROM " + tableName).print();
+//        tEnv.sqlQuery("select * from " + hiveTable).execute().print();
+//        System.out.println("运行完成...");
+
 
     }
 }

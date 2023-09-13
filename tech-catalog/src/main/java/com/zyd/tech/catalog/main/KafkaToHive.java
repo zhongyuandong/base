@@ -106,7 +106,7 @@ public class KafkaToHive {
                 "        SELECT\n" +
                 "               str1,\n" +
                 "               str2,\n" +
-                "               DATE_FORMAT(log_ts, 'yyyy-MM-dd'), DATE_FORMAT(log_ts, 'HH')\n" +
+                "               '20230914', '09'\n" +
                 "               FROM " + tableName);
     }
 
