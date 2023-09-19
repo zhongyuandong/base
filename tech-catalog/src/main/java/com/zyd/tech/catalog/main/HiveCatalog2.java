@@ -111,23 +111,23 @@ public class HiveCatalog2 {
                     +"       'table-name' = 'source_table3' "
                     +" )";
 
-            cdcTableC = "create table " + tableName + " (\n" +
-                    "  mdata row(\n" +
-                    "    cTime bigint,\n" +
-                    "    orgCode varchar\n" +
-                    "  ),\n" +
-                    "  cTime as mdata.cTime,\n" +
-                    "  orgCode as mdata.orgCode\n" +
-                    ") with (\n" +
-                    "  'connector' = 'kafka',\n" +
-                    "  'topic' = 'k8s_test01',\n" +
-                    "  'format' = 'json',\n" +
-                    "  'properties.bootstrap.servers' = 'qa-cdh-001:9093,qa-cdh-002:9093,qa-cdh-003:9093',\n" +
-                    "  'properties.group.id' = 'k8s_test0_202309121',\n" +
-                    "  'scan.startup.mode' = 'group-offsets',\n" +
-                    "  'scan.topic-partition-discovery.interval' = '1000',\n" +
-                    "  'json.ignore-parse-errors' = 'true'\n" +
-                    ")";
+//            cdcTableC = "create table " + tableName + " (\n" +
+//                    "  mdata row(\n" +
+//                    "    cTime bigint,\n" +
+//                    "    orgCode varchar\n" +
+//                    "  ),\n" +
+//                    "  cTime as mdata.cTime,\n" +
+//                    "  orgCode as mdata.orgCode\n" +
+//                    ") with (\n" +
+//                    "  'connector' = 'kafka',\n" +
+//                    "  'topic' = 'k8s_test01',\n" +
+//                    "  'format' = 'json',\n" +
+//                    "  'properties.bootstrap.servers' = 'qa-cdh-001:9093,qa-cdh-002:9093,qa-cdh-003:9093',\n" +
+//                    "  'properties.group.id' = 'k8s_test0_202309121',\n" +
+//                    "  'scan.startup.mode' = 'group-offsets',\n" +
+//                    "  'scan.topic-partition-discovery.interval' = '1000',\n" +
+//                    "  'json.ignore-parse-errors' = 'true'\n" +
+//                    ")";
 
 //            cdcTableC = "create table " + tableName + " (\n" +
 //                    "id INT, name STRING, age INT\n" +
@@ -162,9 +162,9 @@ public class HiveCatalog2 {
 
 
 //        String selectSqlB = "select id,type local_func1 from " + tableName;
-            String selectSqlB = "select * from " + tableName;
+//            String selectSqlB = "select * from " + tableName;
 //            selectSqlB = "select * from user_behavior";
-//            String selectSqlB = "select funEvl1(cTime,orgCode) local_func1 from " + tableName;
+            String selectSqlB = "select funEvl1(cTime,orgCode) local_func1 from " + tableName;
 
         tableEnv.sqlQuery(selectSqlB).execute().print();
 

@@ -127,7 +127,31 @@ public class KafkaSql {
         tEnv.registerCatalog(name,hiveCatalog);
         tEnv.useCatalog(name);
         String selectSqlB = "select funEvl1(deviceTime,mcStatus) aa, rowTime ,'20230915' a1, '09' a2 from " + tableName;
-        tEnv.sqlQuery(selectSqlB).execute().print();
+//        tEnv.sqlQuery(selectSqlB).execute().print();
+
+        tEnv.useDatabase("testdb");
+
+        String hiveTable = "fs_table" + System.currentTimeMillis();
+
+		String hiveSql = "CREATE TABLE " + hiveTable + " (\n" +
+		                 "  user_id STRING,\n" +
+		                 "  order_amount INT" +
+//		                 ") partitioned by (dt string,h string,m string) " +
+//		                 "stored as ORC " +
+//		                 "TBLPROPERTIES (\n" +
+//		                 "  'partition.time-extractor.timestamp-pattern'='$dt $h:$m:00',\n" +
+//		                 "  'sink.partition-commit.delay'='0s',\n" +
+//		                 "  'sink.partition-commit.trigger'='partition-time',\n" +
+//		                 "  'sink.partition-commit.policy.kind'='metastore'" +
+		                 ")";
+        System.out.println("hiveTable>>>" + hiveTable);
+		tEnv.executeSql(hiveSql);
+        String insertSql = "insert into  fs_table  " +
+                "select funEvl1(deviceTime,mcStatus) aa, rowTime ,'20230915' a1, '09' a2, '19' a3 from " + tableName;
+        insertSql = "insert into  " + hiveTable + "  " +
+                "select mcStatus, ctime from " + tableName;
+        tEnv.executeSql(insertSql).print();
+
 //        tEnv.executeSql("CREATE TABLE  default_catalog.default_database.ods_iot_test_di  (\n" +
 //                " device_num string,\n" +
 //                " cloud_time bigint,\n" +

@@ -93,8 +93,8 @@ public class Kafka2Hive {
 
         String name            = "hive_catalog_7";
         String defaultDatabase = "catalog_test";
-//        String hiveConfDir     = "D:\\tmp\\hive-site";
-          String hiveConfDir     = "/opt/flink/conf/hive";
+        String hiveConfDir     = "D:\\tmp\\hive-site";
+//          String hiveConfDir     = "/opt/flink/conf/hive";
 //        String hiveConfDir     = "/opt/bd-pb-data/flink_data/conf/hive";
         String version         = "2.1.1";
         HiveCatalog hiveCatalog = new HiveCatalog(name, defaultDatabase, hiveConfDir,version);
@@ -106,9 +106,10 @@ public class Kafka2Hive {
         System.out.println("获取function信息>>>>" + JSON.toJSONString(elv2));
         tEnv.registerCatalog(name,hiveCatalog);
         tEnv.useCatalog(name);
+        tEnv.useDatabase("testdb");
 //        tEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
         // 创建Hive表
-//        tEnv.executeSql("CREATE TABLE default_catalog.default_database.ods_iot_test_di (" +
+//        tEnv.executeSql("CREATE TABLE ods_iot_test_di (" +
 //                "  user_id STRING, " +
 //                "  order_amount int " +
 //                ") PARTITIONED BY (dt STRING, hr STRING) STORED AS parquet TBLPROPERTIES (" +
@@ -118,9 +119,9 @@ public class Kafka2Hive {
 //                "  'sink.partition-commit.watermark-time-zone'='Asia/Shanghai'," +
 //                "  'sink.partition-commit.policy.kind'='metastore,success-file'" +
 //                ")");
-        tEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
+//        tEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
 
-        tEnv.executeSql("CREATE TABLE default_catalog.default_database.ods_iot_test_di (" +
+        tEnv.executeSql("CREATE TABLE ods_iot_test_di (" +
                 "  user_id STRING, " +
                 "  order_amount int " +
                 ")");
@@ -129,8 +130,8 @@ public class Kafka2Hive {
 //                "SELECT funEvl1(deviceTime,mcStatus) aa, ctime , FROM_UNIXTIME(deviceTime, 'yyyy-MM-dd'),FROM_UNIXTIME(deviceTime, 'HH') \n" +
 //                "FROM " + tableName).print();
         tEnv.getConfig().setSqlDialect(SqlDialect.DEFAULT);
-        tEnv.executeSql("INSERT INTO default_catalog.default_database.ods_iot_test_di \n" +
-                "SELECT funEvl1(deviceTime,mcStatus) aa, ctime  \n" +
+        tEnv.executeSql("INSERT INTO ods_iot_test_di \n" +
+                "SELECT mcStatus aa, ctime  \n" +
                 "FROM " + tableName).print();
 
 //        String insertHive = "INSERT INTO TABLE hive_table \n" +
