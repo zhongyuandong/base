@@ -1,8 +1,5 @@
-package com.zyd.tech.catalog.main;
+package com.hj.flink.demo.catalog;
 
-import com.alibaba.fastjson.JSON;
-import com.zyd.tech.catalog.utils.FlinkUtil;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -11,14 +8,12 @@ import org.apache.flink.table.api.SqlDialect;
 import org.apache.flink.table.api.TableConfig;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.Catalog;
-import org.apache.flink.table.catalog.CatalogFunction;
-import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import org.apache.flink.table.catalog.hive.HiveCatalog;
+
 /**
  * mysql binlog 数据实时写到adb
  */
@@ -56,9 +51,7 @@ public class HiveCatalog2 {
         TableConfig tableConfig = tableEnv.getConfig();
         tableConfig.setSqlDialect(SqlDialect.DEFAULT);
 
-        Configuration flinkConf = FlinkUtil.getConfiguration(env);
-        String appName = flinkConf.getString("yarn.application.name", "flink-cdc-test");
-        tableConfig.getConfiguration().setString("pipeline.name",appName);
+        tableConfig.getConfiguration().setString("pipeline.name","flink-cdc-test");
 
 //      System.setProperty("HADOOP_USER_NAME", "hive1");
         String name            = "hive_catalog_7";
@@ -72,9 +65,9 @@ public class HiveCatalog2 {
 
 //
         //获取function信息
-        CatalogFunction elv2 = hiveCatalog.getFunction(new ObjectPath(defaultDatabase, "funEvl1"));
+//        CatalogFunction elv2 = hiveCatalog.getFunction(new ObjectPath(defaultDatabase, "funEvl1"));
 
-        System.out.println("获取function信息>>>>" + JSON.toJSONString(elv2));
+//        System.out.println("获取function信息>>>>" + JSON.toJSONString(elv2));
 
         tableEnv.registerCatalog(name, (Catalog) hiveCatalog);
         tableEnv.useCatalog(name);
