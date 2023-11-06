@@ -155,7 +155,7 @@ public class HiveCatalog2 {
 //        String selectSqlB = "select id,type local_func1 from " + tableName;
 //            String selectSqlB = "select * from " + tableName;
 //            selectSqlB = "select * from user_behavior";
-            String selectSqlB = "select funEvl1(num1,str1) local_func1 from " + tableName;
+            String selectSqlB = "select funEvl1(num1,str1) local_func122 from " + tableName;
 
         tableEnv.sqlQuery(selectSqlB).execute().print();
 

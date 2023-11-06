@@ -15,6 +15,8 @@
       <module>tech-hbase</module>
     <module>tech-catalog</module>
     <module>tech-flink</module>
+      <module>hbase-bulkload</module>
+    <module>hbase-common</module>
   </modules>
 
   <properties>
