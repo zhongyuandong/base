@@ -1,5 +1,6 @@
 package com.zyd.tech.hbasebulkload.loadhbase;
 
+import com.zyd.common.utils.StringCompressUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Put;
@@ -8,7 +9,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.example.StringCompressUtils;
 
 import java.util.Objects;
 
