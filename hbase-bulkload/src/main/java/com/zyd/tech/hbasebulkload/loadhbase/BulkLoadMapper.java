@@ -8,7 +8,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import com.zyd.common.utils.StringCompressUtils;
+import org.example.StringCompressUtils;
 
 import java.util.Objects;
 

@@ -52,11 +52,13 @@ public class HbaseDriver {
                 ImmutableBytesWritable.class, Put.class, job);
         job.setReducerClass(Reducer.class);
 
-        job.setNumReduceTasks(10);//设置Reducer任务数为2
-        job.getConfiguration().set("mapreduce.map.memory.mb", "2048");//设置Mapper任务使用的内存限制为1024MB。
-        job.getConfiguration().set("mapreduce.reduce.memory.mb", "4092");//设置Reducer任务使用的内存限制为512MB。
-        job.getConfiguration().set("mapreduce.map.cpu.vcores", "4");//设置Mapper任务使用的CPU核心数为1。
-        job.getConfiguration().set("mapreduce.reduce.cpu.vcores", "8");//设置Reducer任务使用的CPU核心数为1
+        if ("1".equals(args[4])){
+            job.setNumReduceTasks(20);//设置Reducer任务数
+//            job.getConfiguration().set("mapreduce.map.memory.mb", "10240");//设置Mapper任务使用的内存限制为8192MB。
+            job.getConfiguration().set("mapreduce.reduce.memory.mb", "10240");//设置Reducer任务使用的内存限制为8192MB。
+//            job.getConfiguration().set("mapreduce.map.cpu.vcores", "10");//设置Mapper任务使用的CPU核心数为8。
+            job.getConfiguration().set("mapreduce.reduce.cpu.vcores", "13");//设置Reducer任务使用的CPU核心数为8
+        }
 
         Path output = new Path(args[1]);
         FileOutputFormat.setOutputPath(job, output);//输出路径
