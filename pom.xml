@@ -17,6 +17,7 @@
     <module>tech-flink</module>
       <module>hbase-bulkload</module>
     <module>hbase-common</module>
+      <module>flink-sql</module>
   </modules>
 
   <properties>

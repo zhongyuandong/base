@@ -1,4 +1,4 @@
-package com.zyd.tech.catalog.test;
+package com.zyd.flinksql;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -15,9 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import org.apache.flink.configuration.Configuration;
-
 /**
  * 本地运行flink,提交flink sql
  *
