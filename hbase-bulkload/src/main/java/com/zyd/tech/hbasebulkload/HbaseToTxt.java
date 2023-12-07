@@ -1,5 +1,6 @@
 package com.zyd.tech.hbasebulkload;
 
+import com.zyd.common.utils.StringCompressUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;

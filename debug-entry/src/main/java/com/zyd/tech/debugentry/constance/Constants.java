@@ -1,4 +1,4 @@
-package com.zyd.common.constance;
+package com.zyd.tech.debugentry.constance;
 
 /**
  * @program: base
@@ -7,7 +7,7 @@ package com.zyd.common.constance;
  * @create: 2023-08-10 15:08:02
  * @Version 1.0
  **/
-public interface Constants extends StringPool {
+public interface Constants {
 
     public static final String SORT_PROPERTY_UPDATE_TIME = "UPDATE_TIME";
     public static final String SORT_DIRECTION_ASC = "ASC";

@@ -3,6 +3,7 @@ package com.zyd.flinksql;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.CheckpointingMode;
@@ -31,8 +32,8 @@ public class FlinkSqlRunner {
     public static void main(String[] args) throws Exception {
         Map<String, String> map = new HashMap<>();
         map.put("table.exec.state.ttl", "1d");
-        runFlinkSql("output.sql", null, map);
-//        runFlinkSql("row_default_value.sql", null, map);
+//        runFlinkSql("output.sql", null, map);
+        runFlinkSql("realTimeStatus.sql", null, map);
     }
 
     public static void runFlinkSql(String sqlFile, Map<String, String> envConf, Map<String, String> tableEnvConf) throws Exception {
@@ -40,10 +41,11 @@ public class FlinkSqlRunner {
         if (MapUtils.isNotEmpty(envConf)) {
             envConfig.addAll(Configuration.fromMap(envConf));
         }
-        envConfig.setString(RestOptions.BIND_PORT, "8081-8089");
+        envConfig.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
+        //envConfig.setString(RestOptions.BIND_PORT, "8081-8089");
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(envConfig);
         env.setParallelism(1);
-        env.enableCheckpointing(60000, CheckpointingMode.EXACTLY_ONCE);
+        env.enableCheckpointing(6000, CheckpointingMode.EXACTLY_ONCE);
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
         Configuration tableEnvConfig = tEnv.getConfig().getConfiguration();
         if (MapUtils.isNotEmpty(tableEnvConf)) {
@@ -62,8 +64,15 @@ public class FlinkSqlRunner {
             if (StringUtils.isBlank(sql)) {
                 continue;
             }
+            sql = sql.trim();
             System.out.println(sql);
-            tEnv.executeSql(sql);
+            System.out.println("===================================");
+            if (sql.toUpperCase().startsWith("SELECT")){
+                System.out.println("查询语句...");
+                tEnv.executeSql(sql).print();
+                continue;
+            }
+            tEnv.executeSql(sql).print();
         }
     }
 }
